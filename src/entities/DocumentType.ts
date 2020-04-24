@@ -1,4 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn  } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Module } from './Module';
+import { State } from './State';
+import { Client } from './Client';
 
 @Entity()
 export class DocumentType {
@@ -12,12 +15,15 @@ export class DocumentType {
         unique: true
     })
     name: string;
+    
+    @ManyToOne(type => Module, module => module.states)
+    module: number;
 
-    @Column()
-    modulo: number;
+    @ManyToOne(type => State, state => state.documenttypes)
+    state: number;
 
-    @Column()
-    estado: number;
+    @OneToMany(type => Client, client => client.documenttype)
+    clients: Client[];
 
     @Column()
     @CreateDateColumn()

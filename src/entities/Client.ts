@@ -1,24 +1,30 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { DocumentType } from './DocumentType';
 
 @Entity()
-export class Cliente{
+export class Client{
 
   @PrimaryGeneratedColumn('increment')
   id:string;
 
   @Column({
       type: 'varchar',
-      nullable: false,
       length: 50,
   })
-  nombre: string;
+  name: string;
 
   @Column({
-    type: 'varchar',
-    nullable: false,
+    type: 'varchar'
   })
-  apellido: string;
+  lastname: string;
 
+  @ManyToOne(type => DocumentType, documenttype => documenttype.clients)
+  documenttype: number;
 
+  @Column({
+      type: 'varchar',
+      length: 15
+  })
+  documentnumber: string;
 
 }
