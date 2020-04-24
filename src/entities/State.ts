@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany  } from 'typeorm';
 import {Module} from "./Module";
 import { DocumentType } from './DocumentType';
+import { Client } from './Client';
 
 @Entity()
 export class State {
@@ -20,6 +21,10 @@ export class State {
 
     @OneToMany(type => DocumentType, documenttype => documenttype.state)
     documenttypes: DocumentType[];
+
+
+    @OneToMany(type => Client, client => client.state) 
+    clients: Client[];
 
     @Column()
     @CreateDateColumn()
