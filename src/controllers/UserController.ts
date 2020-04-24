@@ -91,7 +91,7 @@ class UserController {
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {
-          //Si ni encuentra al usuario, responde 404
+          //Si no encuentra al usuario, responde 404
           res.status(404).send("User not found");
           return;
         }
@@ -109,7 +109,7 @@ class UserController {
         try {
           await userRepository.save(user);
         } catch (e) {
-          res.status(409).send("El Email que intenta guardar ya esta en usos");
+          res.status(409).send("El Email que intenta guardar ya esta en uso");
           return;
         }
         //Despues de Todo envia una respuesta 204
