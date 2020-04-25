@@ -1,10 +1,9 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
-import { Module } from './Module';
-import { State } from './State';
-import { Client } from './Client';
+import { Department } from './Department';
+import { City } from './City';
 
 @Entity()
-export class DocumentType {
+export class Municipality {
 
     @PrimaryGeneratedColumn('increment')
     id: number;
@@ -14,15 +13,19 @@ export class DocumentType {
         length: 100
     })
     name: string;
-    
-    @ManyToOne(type => Module, module => module.states)
-    module: number;
 
-    @ManyToOne(type => State, state => state.documenttypes)
-    state: number;
+    @Column({
+        type: "varchar",
+        length: 15,
+        unique: true
+    })
+    danecode: string;
 
-    @OneToMany(type => Client, client => client.documenttype)
-    clients: Client[];
+    @ManyToOne(type => Department, department => department.municipalities)
+    department: number;
+
+    @OneToMany(type => City, city => city.municipality)
+    cities: City[];
 
     @Column()
     @CreateDateColumn()

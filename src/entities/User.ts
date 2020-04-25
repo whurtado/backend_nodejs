@@ -1,12 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, 
-         Unique, CreateDateColumn, UpdateDateColumn 
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable} from 'typeorm';
 import { Length, IsNotEmpty } from "class-validator";
 import * as bcrypt from "bcryptjs";
+import { Role } from './Role';
+import { Permission } from './Permission';
 
 @Entity()
 @Unique(["email"])
-export class Usuario{
+export class User{
 
   @PrimaryGeneratedColumn('increment')
   id:string;
@@ -33,6 +33,14 @@ export class Usuario{
     nullable: false,
   })
   estado: string;
+
+  @ManyToMany(type => Role, role => role.users)
+  @JoinTable()
+  roles: Role[];
+
+  @ManyToMany(type => Permission, permission => permission.users)
+  @JoinTable()
+  permissions: Permission[];
 
   @Column()
   @CreateDateColumn()

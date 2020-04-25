@@ -1,41 +1,50 @@
 import { Request, Response} from 'express';
 import { getRepository } from 'typeorm';
-import { Usuario } from '../entities/Usuario';
+import { User } from '../entities/User';
 import { validate } from "class-validator";
 
-class UserController {
+class UserController { 
 
-     static getUsuarios = async (req: Request, res: Response) => {
+     static getUsers = async (req: Request, res: Response) => {
         //Get users from database
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         const users = await userRepository.find({
           select: ["id", "nombre", "email", "estado"]
         });
       
         //Retorna Un Objeto de usuarios
-        res.send(users);
+        res.json({
+          ok: true,
+          message: "Consulta exitosa",
+          data: users
+        });
       };
       
-      static getUsuario = async (req: Request, res: Response) => {
+      static getUser = async (req: Request, res: Response) => {
         //Se obtiene el id que llega por parametro en la url
         const id: string = req.params.id;
       
         //Se obtiene el usuario de la base de datos
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         try {
           const user = await userRepository.findOneOrFail(id, {
             select: ["id", "nombre", "email", "estado"]
           });
-          res.send(user);
+          
+          res.json({
+            ok: true,
+            message: "Consulta exitosa",
+            data: user
+          });
         } catch (error) {
           res.status(404).send(`Usuario con id ${ id } no encontrado`);
         }
       };
 
-    static createUsuario = async (req: Request, res: Response) => {
+    static createUser = async (req: Request, res: Response) => {
         //Se obtienen los parametros que llegan en el body
         let { nombre, email, password, estado } = req.body;
-        let user      = new Usuario();
+        let user      = new User();
         user.nombre   = nombre;
         user.email    = email;
         user.password = password;
@@ -52,7 +61,7 @@ class UserController {
         user.hashPassword();
       
         //Try to save. If fails, the username is already in use
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         try {
             const  results = await userRepository.save(user);
 
@@ -65,20 +74,17 @@ class UserController {
             });
 
         } catch (e) {
-          res.status(409).send("username already in use");
+          res.status(409).json({
+            ok: false,
+            mensaje: "EL email que intenta crear ya esta en uso"
+          });
           return;
         }
       
         
       };
-      
-    /*static createUsuario = async (req: Request,res: Response): Promise<Response> => {
-    const newUsuario = await getRepository(Usuario).create(req.body);
-    const results = await getRepository(Usuario).save(newUsuario);
-    return res.json(results);
-    };*/
 
-    static updateUsuario = async (req: Request, res: Response) => {
+    static updateUser = async (req: Request, res: Response) => {
         //Se obtiene el id que viene en la url
         const id = req.params.id;
       
@@ -86,12 +92,12 @@ class UserController {
         const { email, estado } = req.body;
       
         //Se busca el usuario ha actualizar en la base de datos
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         let user;
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {
-          //Si ni encuentra al usuario, responde 404
+          //Si no encuentra al usuario, responde 404
           res.status(404).send("User not found");
           return;
         }
@@ -101,7 +107,10 @@ class UserController {
         user.estado = estado;
         const errors = await validate(user);
         if (errors.length > 0) {
-          res.status(400).send(errors);
+          res.status(400).json({
+                ok: false,
+                message: errors
+             });
           return;
         }
       
@@ -109,29 +118,41 @@ class UserController {
         try {
           await userRepository.save(user);
         } catch (e) {
-          res.status(409).send("El Email que intenta guardar ya esta en usos");
+          res.status(409).json({
+              ok: false,
+              message: "El Email que intenta guardar ya esta en uso"
+            });
           return;
         }
         //Despues de Todo envia una respuesta 204
-        res.status(204).send();
-      };
+        res.status(204).json({
+            ok: true,
+            message: "Usuario actualizado correctamente"
+          });
+        };
       
-      static deleteUsuario = async (req: Request, res: Response) => {
+      static deleteUser = async (req: Request, res: Response) => {
         //Se obtiene el id que viene en la url
         const id = req.params.id;
       
-        const userRepository = getRepository(Usuario);
-        let user: Usuario;
+        const userRepository = getRepository(User);
+        let user: User;
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {
-          res.status(404).send("Usuario no encontrado");
+          res.status(404).json({
+                ok: false,
+                message: "Usuario no encontrado"
+              });
           return;
         }
         userRepository.delete(id);
       
         //After all send a 204 (no content, but accepted) response
-        res.status(204).send();
+        res.status(204).json({
+                  ok: true,
+                  message: "Usuario eliminado correctamente"
+              });
       };
       
 
