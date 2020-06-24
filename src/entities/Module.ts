@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany  } from 'typeorm';
-import { State } from './State';
+import { Status } from './Status';
 import { DocumentType } from './DocumentType';
 
 @Entity()
@@ -15,8 +15,8 @@ export class Module {
     })
     name: string;
 
-    @OneToMany(type => State, state => state.module)
-    states: State[];
+    @OneToMany(type => Status, status => status.module)
+    status: Status[];
 
     @OneToMany(type => DocumentType, documenttype => documenttype.module)
     documenttypes: DocumentType[];

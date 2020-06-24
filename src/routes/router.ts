@@ -1,5 +1,5 @@
 import { Router, Request, Response } from 'express';
-import { getClientes, getCliente, createCliente, updateCliente, deleteCliente } from '../controllers/Cliente.controller';
+//import { getClientes, getCliente, createCliente, updateCliente, deleteCliente } from '../controllers/Cliente.controller';
 import { getUsuarios, getUsuario, createUsuario, updateUsuario, deleteUsuario } from '../controllers/Usuario.controller';
 
 
@@ -53,11 +53,11 @@ router.delete('/user/:id', deleteUsuario);
 
 
 //RUTAS CLIENTE
-router.get('/customer', getClientes);
-router.get('/customer/:id', getCliente);
-router.post('/customer', createCliente);
-router.put('/customer/:id', updateCliente);
-router.delete('/customer/:id', deleteCliente);
+// router.get('/customer', getClientes);
+// router.get('/customer/:id', getCliente);
+// router.post('/customer', createCliente);
+// router.put('/customer/:id', updateCliente);
+// router.delete('/customer/:id', deleteCliente);
 
 
 
