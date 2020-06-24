@@ -1,8 +1,9 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, Unique, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany } from 'typeorm';
 import { Department } from './Department';
 import { City } from './City';
 
 @Entity()
+@Unique(["name"])
 export class Municipality {
 
     @PrimaryGeneratedColumn('increment')
@@ -20,12 +21,6 @@ export class Municipality {
         unique: true
     })
     danecode: string;
-
-    @ManyToOne(type => Department, department => department.municipalities)
-    department: number;
-
-    @OneToMany(type => City, city => city.municipality)
-    cities: City[];
 
     @Column()
     @CreateDateColumn()
