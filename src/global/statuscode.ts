@@ -11,10 +11,6 @@ export const HTTP_STATUS_CODE_CREATED = 201;
  *  El request se ha aceptado para procesarlo, pero el proceso aún no ha terminado.
  */
 export const HTTP_STATUS_CODE_ACCEPTED = 202;
-/**
- *  El request se ha procesado correctamente, pero no devuelve ningún contenido.
- */
-export const HTTP_STATUS_CODE_NO_CONTENT = 204;
 
 
 

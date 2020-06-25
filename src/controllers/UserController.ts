@@ -3,7 +3,7 @@ import { getRepository } from 'typeorm';
 import { Usuario } from '../entities/Usuario';
 import { validate, ValidationError } from 'class-validator';
 import ApiResponse from '../classes/ApiResponse';
-import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NO_CONTENT, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
+import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 
 class UserController {
 
@@ -108,8 +108,8 @@ class UserController {
             UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_CONFLICT, false, "El Email que intenta guardar ya esta en usos");
             return;
         }
-        //Despues de Todo envia una respuesta 204
-        UserController.sendResponse(res, null, HTTP_STATUS_CODE_NO_CONTENT, true, "Usuario actualizado");
+        //Despues de Todo envia una respuesta 200
+        UserController.sendResponse(res, null, HTTP_STATUS_CODE_OK, true, "Usuario actualizado");
       };
       
       static deleteUsuario = async (req: Request, res: Response) => {
@@ -127,7 +127,7 @@ class UserController {
         userRepository.delete(id);
       
         //After all send a 204 (no content, but accepted) response
-        UserController.sendResponse(res, null, HTTP_STATUS_CODE_NO_CONTENT);
+        UserController.sendResponse(res, null, HTTP_STATUS_CODE_OK);
       };
       
 
