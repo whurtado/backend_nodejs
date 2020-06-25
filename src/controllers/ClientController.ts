@@ -3,7 +3,7 @@ import { Request, Response} from 'express';
 import { getRepository, FindManyOptions } from 'typeorm';
 import { Client } from '../entities/Client';
 import ApiResponse from '../classes/ApiResponse';
-import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NO_CONTENT, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
+import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 import { ValidationError, validate } from 'class-validator';
 
 
@@ -11,7 +11,7 @@ import { ValidationError, validate } from 'class-validator';
 class ClientController {
 
     static options : FindManyOptions<Client> = {
-        relations: ["status", "documenttype", "city"],
+        relations: ["status", "documenttype", "city", "city.department"],
         order: {
             name: "ASC" 
         }
@@ -31,16 +31,25 @@ class ClientController {
         //Se obtiene el cliente de la base de datos
         const clientRepository = getRepository(Client);
         try {
-            const client = await clientRepository.findOneOrFail(id, ClientController.options);
+            const client = await clientRepository.findOne(id, ClientController.options);
+            if(client===undefined){
+                let error = new Error();
+                error.message = `Cliente con id ${id} no encontrado`;
+                error.name = HTTP_STATUS_CODE_NOT_FOUND.toString();
+                throw error;
+            }
             ClientController.sendResponse(res, client);
         } catch (error) {
-            ClientController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_FOUND, false, `Cliente con id ${id} no encontrado`);
+            if(error instanceof Error){
+                ClientController.sendResponse(res, null, parseInt(error.name), false, error.message);
+            }else{
+                ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+            }
         }
     }    
 
     static createClient = async (req: Request, res: Response) => {
-        console.log(req.body);
-
+       
         try {
             let {
                 name, 
@@ -69,7 +78,7 @@ class ClientController {
             const errors = await validate(client);
             if (errors.length > 0) {
                 console.log(errors);
-                throw new Error('Datos en el formulario invalidos');
+                throw new Error('Datos no validos');
             }
             console.log('grabar cliente');
             const clientRepository = getRepository(Client);
@@ -82,9 +91,64 @@ class ClientController {
         }
     }
 
+    static updateClient = async(req: Request, res: Response) => {
+        try {
+            const id = req.params.id;
+            const {
+                name, 
+                documenttype, 
+                documentnumber, 
+                city, 
+                homeaddres, 
+                phone, 
+                email,
+                status,
+                observations
+            } = req.body;
+
+            const clientRepository = getRepository(Client);
+
+            let client = await clientRepository.findOne(id);
+
+            if(client===undefined){
+                let error = new Error();
+                error.message = `Cliente con id ${id} no encontrado`;
+                error.name = HTTP_STATUS_CODE_NOT_FOUND.toString();
+                throw error;
+            }
+
+            client.name = name ;
+            client.documenttype = documenttype ;
+            client.documentnumber = documentnumber;
+            client.city = city;
+            client.homeaddres = homeaddres;
+            client.phone = phone;
+            client.email = email;
+            client.status = status;
+            client.observations = observations;
+
+            //Validade if the parameters are ok
+            const errors = await validate(client);
+            if (errors.length > 0) {
+                console.log(errors);
+                throw new Error('Datos no validos');
+            }
+           
+            const result = await clientRepository.save(client);
+        
+            ClientController.sendResponse(res, result, HTTP_STATUS_CODE_OK, true, "Cliente actualizado correctamente");
+            
+        } catch (error) {
+            if(error instanceof Error){
+                ClientController.sendResponse(res, null, parseInt(error.name), false, error.message);
+            }else{
+                ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+            }
+        }
+    }
+
     static sendResponse(response : Response, data: any = null, code : number = HTTP_STATUS_CODE_OK, ok : boolean = true, message : string = "OK", validationError? : ValidationError[]) {
-        const apiResponse = new ApiResponse(response, code, ok, message, data, validationError);
-        apiResponse.sendResponse();
+        new ApiResponse(response, code, ok, message, data, validationError);
     }
 }
 
