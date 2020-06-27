@@ -5,6 +5,7 @@ import { Client } from '../entities/Client';
 import ApiResponse from '../classes/ApiResponse';
 import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 import { ValidationError, validate } from 'class-validator';
+import PaniteData from '../classes/PaginateData';
 
 
 
@@ -19,15 +20,33 @@ class ClientController {
 
     static getAllClients = async (req: Request, res: Response) => {
         const clientRepository = getRepository(Client);
-        const clients = await clientRepository.find(ClientController.options);
-       
-        ClientController.sendResponse(res, clients);
+        try {
+            const clients = await clientRepository.find(ClientController.options);
+            ClientController.sendResponse(res, clients);
+        } catch (error) {
+            ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+        }
     }
 
-    static getOneClient = async (req: Request, res: Response) => {
+    static getAllClientsPaginated = async (req: Request, res: Response) => {
+        try {
+            const data = await PaniteData.paginator(req, Client, {
+                relations: ["status", "documenttype", "city", "city.department"],
+                order: {
+                    name: "ASC" 
+                }
+            });
+            ClientController.sendResponse(res, data);
+        } catch (error) {
+            ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+        }
+    }
 
+    static getClient = async (req: Request, res: Response) => {
         //Se obtiene el id que llega por parametro en la url
         const id: string = req.params.id;
+        console.log('id cliente: ', id);
+        console.log('options: ', ClientController.options);
         //Se obtiene el cliente de la base de datos
         const clientRepository = getRepository(Client);
         try {

@@ -31,7 +31,7 @@ export default class ApiResponse implements ApiResponseInterface {
             status: this.status,
             validationsErros: this.validationsErros
         }
-        this.response.setHeader('Content-Type', 'text/plain');
+        this.response.setHeader('Content-Type', 'application/json');
         this.response.status(this.status).json(result);
     }
     
