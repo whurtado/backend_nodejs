@@ -1,6 +1,6 @@
 import { Request, Response} from 'express';
 import { getRepository, FindManyOptions } from 'typeorm';
-import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NO_CONTENT, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
+import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 import { DocumentType } from '../entities/DocumentType';
 import ApiResponse from '../classes/ApiResponse';
 import { ValidationError } from 'class-validator';
