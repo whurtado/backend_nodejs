@@ -1215,3 +1215,9 @@ INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (2
 INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (3, 'SUSPENDIDO PAGO', '2020-06-10 17:48:40.553249', '2020-06-10 17:48:40.553249', 6);
 INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (5, 'ACTIVO', '2020-06-10 19:45:44.398083', '2020-06-10 19:45:44.398083', 2);
 INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (6, 'INACTIVO', '2020-06-10 19:45:44.398083', '2020-06-10 19:45:44.398083', 2);
+
+
+update client set name = upper(name);
+update client set observations = upper(observations);
+update client set homeaddres = upper(homeaddres);
+update client set email = upper(email);

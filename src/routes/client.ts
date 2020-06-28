@@ -6,6 +6,7 @@ const router = Router();
 router.get('/', ClientController.getAllClients);
 router.get('/:id', ClientController.getClient);
 router.get('/:page/:limit', ClientController.getAllClientsPaginated),
+router.post('/pagination-filters/', ClientController.getAllClientsPaginated),
 router.post('/', ClientController.createClient);
 router.put('/:id', ClientController.updateClient);
 // router.delete('/:id', ClientController.deleteClient);

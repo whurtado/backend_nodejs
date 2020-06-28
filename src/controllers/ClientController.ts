@@ -1,12 +1,11 @@
 
 import { Request, Response} from 'express';
-import { getRepository, FindManyOptions } from 'typeorm';
+import { getRepository, FindManyOptions, Like } from 'typeorm';
 import { Client } from '../entities/Client';
 import ApiResponse from '../classes/ApiResponse';
 import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 import { ValidationError, validate } from 'class-validator';
 import PaniteData from '../classes/PaginateData';
-
 
 
 class ClientController {
@@ -29,9 +28,12 @@ class ClientController {
     }
 
     static getAllClientsPaginated = async (req: Request, res: Response) => {
+        console.log('getAllClientsPaginated ->  body: ', req.body);
         try {
+            const where = ClientController.getWhere(req);
             const data = await PaniteData.paginator(req, Client, {
                 relations: ["status", "documenttype", "city", "city.department"],
+                where,
                 order: {
                     name: "ASC" 
                 }
@@ -40,6 +42,33 @@ class ClientController {
         } catch (error) {
             ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
         }
+    }
+
+    private static getWhere (req: Request) {
+        let where: any = {};
+        if(req.body.filters !== undefined){
+            if(req.body.filters.name !== null && req.body.filters.name !== ''){
+                let name : string = req.body.filters.name;
+                console.log('where name: ', name);
+                where.name = Like("%"+ name.toUpperCase() +"%");
+            }
+            if(req.body.filters.documenttype !== null && req.body.filters.documenttype !== ''){
+                where.documenttype = req.body.filters.documenttype;
+            }
+            if(req.body.filters.documentnumber !== null && req.body.filters.documentnumber !== ''){
+                where.documentnumber = req.body.filters.documentnumber;
+            }
+            if(req.body.filters.city !== null && req.body.filters.city !== ''){
+                where.city = req.body.filters.city;
+            }
+            if(req.body.filters.status !== null && req.body.filters.status !== ''){
+                where.status = req.body.filters.status;
+            }
+            if(req.body.filters.department !== null && req.body.filters.department !== ''){
+                //where.city.department.id = req.body.filters.department;
+            }
+        }
+        return where;
     }
 
     static getClient = async (req: Request, res: Response) => {
@@ -80,18 +109,18 @@ class ClientController {
                 email,
                 status,
                 observations
-            } = req.body;
+            } : Client = req.body;
 
             let client = new Client();
-            client.name = name ;
+            client.name = name.toUpperCase();
             client.documenttype = documenttype ;
             client.documentnumber = documentnumber;
             client.city = city;
-            client.homeaddres = homeaddres;
+            client.homeaddres = homeaddres.toUpperCase();
             client.phone = phone;
             client.email = email;
             client.status = status;
-            client.observations = observations;
+            client.observations = observations.toUpperCase();
 
             //Validade if the parameters are ok
             const errors = await validate(client);
@@ -123,7 +152,7 @@ class ClientController {
                 email,
                 status,
                 observations
-            } = req.body;
+            } : Client = req.body;
 
             const clientRepository = getRepository(Client);
 
@@ -136,15 +165,15 @@ class ClientController {
                 throw error;
             }
 
-            client.name = name ;
+            client.name = name.toUpperCase();
             client.documenttype = documenttype ;
             client.documentnumber = documentnumber;
             client.city = city;
-            client.homeaddres = homeaddres;
+            client.homeaddres = homeaddres.toUpperCase();
             client.phone = phone;
             client.email = email;
             client.status = status;
-            client.observations = observations;
+            client.observations = observations.toUpperCase();
 
             //Validade if the parameters are ok
             const errors = await validate(client);
@@ -170,9 +199,5 @@ class ClientController {
         new ApiResponse(response, code, ok, message, data, validationError);
     }
 }
-
-
-
-
 
 export default ClientController;
