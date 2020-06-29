@@ -20,7 +20,6 @@ export default class ApiResponse implements ApiResponseInterface {
         this.status = code;
         this.validationsErros = validationError;
         this.response = response;
-        this.sendResponse();
     }
 
     sendResponse() {
