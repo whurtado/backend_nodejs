@@ -196,7 +196,8 @@ class ClientController {
     }
 
     static sendResponse(response : Response, data: any = null, code : number = HTTP_STATUS_CODE_OK, ok : boolean = true, message : string = "OK", validationError? : ValidationError[]) {
-        new ApiResponse(response, code, ok, message, data, validationError);
+        const apiResponse = new ApiResponse(response, code, ok, message, data, validationError);
+        apiResponse.sendResponse();
     }
 }
 
