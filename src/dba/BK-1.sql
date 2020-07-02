@@ -1217,7 +1217,40 @@ INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (5
 INSERT INTO public.status (id, name, createdat, updatedat, "moduleId") VALUES (6, 'INACTIVO', '2020-06-10 19:45:44.398083', '2020-06-10 19:45:44.398083', 2);
 
 
-update client set name = upper(name);
-update client set observations = upper(observations);
-update client set homeaddres = upper(homeaddres);
-update client set email = upper(email);
+UPDATE client SET name = upper(name);
+UPDATE client SET observations = upper(observations);
+UPDATE client SET homeaddres = upper(homeaddres);
+UPDATE client SET email = upper(email);
+
+--
+-- FECHA: 2020-07-01 -----
+-- Actualizar los nombres de las ciudades y departamentos
+--
+
+CREATE OR REPLACE FUNCTION public.fc_separate_words(text)
+  RETURNS text AS
+$BODY$
+DECLARE 
+  words ALIAS FOR $1;
+  array_capital_letters  VARCHAR[];
+BEGIN
+	array_capital_letters := ARRAY['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']::VARCHAR[];
+	FOR i IN 1.. array_length(array_capital_letters, 1) LOOP
+		words = replace(words, array_capital_letters[i], ' '||array_capital_letters[i]);
+		--RAISE NOTICE 'Letra: %', array_capital_letters[i];
+	END LOOP;
+	words = replace(words, 'de ', ' de ');
+	words = replace(words, 'del ', ' del ');
+	words = upper(words);
+	words = trim(words);
+	--RAISE NOTICE 'words: %', words;
+  RETURN words;
+END;
+$BODY$
+LANGUAGE plpgsql VOLATILE
+COST 100;
+
+-- select fc_separate_words('LisethDayanaCastilloQuiñones');
+-- UPDATE ---
+UPDATE department SET name = fc_separate_words(name);
+UPDATE city SET name = fc_separate_words(name);
