@@ -22,10 +22,13 @@ server.app.use( bodyParser.json() );
 
 // CORS
 //server.app.use( cors({ origin: true, credentials: true  }) );
+// var corsOptions = {
+//     origin: "http://localhost:8081"
+// };
 var corsOptions = {
-    origin: "http://localhost:8081"
+    origin: true,
+    credentials: true
 };
-
 server.app.use(cors(corsOptions));
 
 //se define el path dela aplicacion de donde se van a llamar las rutas
