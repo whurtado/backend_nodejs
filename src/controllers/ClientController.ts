@@ -1,11 +1,12 @@
 
 import { Request, Response} from 'express';
 import { getRepository, FindManyOptions, Like } from 'typeorm';
-import { Client } from '../entities/Client';
-import ApiResponse from '../classes/ApiResponse';
-import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 import { ValidationError, validate } from 'class-validator';
-import PaniteData from '../classes/PaginateData';
+import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
+import ApiResponse from '../classes/ApiResponse';
+import PaginateData from '../classes/PaginateData';
+import { Client } from '../entities/Client';
+import DataNotFoundError from '../classes/errors/DataNotFoundError';
 
 
 class ClientController {
@@ -20,8 +21,8 @@ class ClientController {
     static getAllClients = async (req: Request, res: Response) => {
         const clientRepository = getRepository(Client);
         try {
-            const clients = await clientRepository.find(ClientController.options);
-            ClientController.sendResponse(res, clients);
+            const data = await clientRepository.find(ClientController.options);
+            ClientController.sendResponse(res, data);
         } catch (error) {
             ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
         }
@@ -31,7 +32,7 @@ class ClientController {
         console.log('getAllClientsPaginated ->  body: ', req.body);
         try {
             const where = ClientController.getWhere(req);
-            const data = await PaniteData.paginator(req, Client, {
+            const data = await PaginateData.paginator(req, Client, {
                 relations: ["status", "documenttype", "city", "city.department"],
                 where,
                 order: {
@@ -81,15 +82,15 @@ class ClientController {
         try {
             const client = await clientRepository.findOne(id, ClientController.options);
             if(client===undefined){
-                let error = new Error();
+                let error = new DataNotFoundError();
                 error.message = `Cliente con id ${id} no encontrado`;
-                error.name = HTTP_STATUS_CODE_NOT_FOUND.toString();
+                error.statusCode = HTTP_STATUS_CODE_NOT_FOUND;
                 throw error;
             }
             ClientController.sendResponse(res, client);
         } catch (error) {
-            if(error instanceof Error){
-                ClientController.sendResponse(res, null, parseInt(error.name), false, error.message);
+            if(error instanceof DataNotFoundError){
+                ClientController.sendResponse(res, null, error.statusCode, false, error.message);
             }else{
                 ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
             }
@@ -159,9 +160,9 @@ class ClientController {
             let client = await clientRepository.findOne(id);
 
             if(client===undefined){
-                let error = new Error();
+                let error = new DataNotFoundError();
                 error.message = `Cliente con id ${id} no encontrado`;
-                error.name = HTTP_STATUS_CODE_NOT_FOUND.toString();
+                error.statusCode = HTTP_STATUS_CODE_NOT_FOUND;
                 throw error;
             }
 
@@ -187,8 +188,8 @@ class ClientController {
             ClientController.sendResponse(res, result, HTTP_STATUS_CODE_OK, true, "Cliente actualizado correctamente");
             
         } catch (error) {
-            if(error instanceof Error){
-                ClientController.sendResponse(res, null, parseInt(error.name), false, error.message);
+            if(error instanceof DataNotFoundError){
+                ClientController.sendResponse(res, null, error.statusCode, false, error.message);
             }else{
                 ClientController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
             }

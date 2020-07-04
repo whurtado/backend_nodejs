@@ -8,7 +8,7 @@ import { City } from './City';
 export class Client{
 
     @PrimaryGeneratedColumn('increment')
-    id:string;
+    id:number;
 
     @Column({
         type: 'varchar',

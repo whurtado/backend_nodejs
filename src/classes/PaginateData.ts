@@ -1,7 +1,7 @@
 import { Entity, getRepository, FindManyOptions } from 'typeorm';
 import { Request } from 'express';
 
-export default class PaniteData {
+export default class PaginateData {
     
 
     static async paginator(req: Request, entity: any, optinos?: FindManyOptions<any>){
