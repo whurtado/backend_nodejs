@@ -7,6 +7,8 @@ import documentType from "./documentType";
 import city from "./city";
 import department from "./department";
 import status from "./status";
+import smtpServer  from "./smtpServer";
+
 
 
 const routes = Router();
@@ -19,5 +21,6 @@ routes.use("/document-type", documentType);
 routes.use("/city", city);
 routes.use("/department", department);
 routes.use("/status", status);
+routes.use("/smtp-server", smtpServer);
 
 export default routes; 
