@@ -2,6 +2,7 @@ import { Entity, Column, Unique, PrimaryGeneratedColumn, CreateDateColumn, Updat
 import {Module} from "./Module";
 import { DocumentType } from './DocumentType';
 import { Client } from './Client';
+import { SmtpServer } from './SmtpServer';
 
 @Entity()
 @Unique(["name", "module"])
@@ -24,6 +25,9 @@ export class Status {
 
     @OneToMany(type => Client, client => client.status) 
     clients: Client[];
+
+    @OneToMany(type => SmtpServer, smtpserver => smtpserver.status) 
+    smtpservers: SmtpServer[];
 
     @Column()
     @CreateDateColumn()

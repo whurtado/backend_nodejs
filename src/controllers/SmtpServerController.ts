@@ -13,7 +13,7 @@ class SmtpServerController {
     static getAllSmtpServers = async (req: Request, res: Response) => {
         const smtpServerRepository = getRepository(SmtpServer);
         try {
-            const data = await smtpServerRepository.find();
+            const data = await smtpServerRepository.find({relations: ["status"]});
             SmtpServerController.sendResponse(res, data);
         } catch (error) {
             SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
@@ -89,7 +89,9 @@ class SmtpServerController {
                 host, 
                 port, 
                 user, 
-                password
+                password,
+                status,
+                encryption,
             } : SmtpServer = req.body;
 
             let smtpServer = new SmtpServer();
@@ -97,6 +99,8 @@ class SmtpServerController {
             smtpServer.port = port;
             smtpServer.user = user;
             smtpServer.password = password;
+            smtpServer.status = status;
+            smtpServer.encryption = encryption;
 
             //Validade if the parameters are ok
             const errors = await validate(smtpServer);
@@ -122,7 +126,9 @@ class SmtpServerController {
                 host, 
                 port, 
                 user, 
-                password
+                password,
+                status,
+                encryption,
             } : SmtpServer = req.body;
 
             const smtpServerRepository = getRepository(SmtpServer);
@@ -140,6 +146,8 @@ class SmtpServerController {
             smtpServer.port = port;
             smtpServer.user = user;
             smtpServer.password = password;
+            smtpServer.status = status;
+            smtpServer.encryption = encryption;
 
             //Validade if the parameters are ok
             const errors = await validate(smtpServer);
