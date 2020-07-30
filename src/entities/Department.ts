@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, Unique } from 'typeorm';
 import { Country } from './Country';
-import { Municipality } from './Municipality';
+import { City } from './City';
 
 @Entity()
 @Unique(["name", "country"])
@@ -25,8 +25,8 @@ export class Department {
     @ManyToOne(type => Country, country => country.departments)
     country: number;
 
-    @OneToMany(type => Municipality, municipality => municipality.department)
-    municipalities: Municipality[];
+    @OneToMany(type => City, city => city.department)
+    cities: City[];
 
     @Column()
     @CreateDateColumn()

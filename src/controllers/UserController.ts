@@ -1,7 +1,9 @@
 import { Request, Response} from 'express';
 import { getRepository } from 'typeorm';
 import { User } from '../entities/User';
-import { validate } from "class-validator";
+import { validate, ValidationError } from 'class-validator';
+import ApiResponse from '../classes/ApiResponse';
+import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 
 class UserController { 
 
@@ -11,13 +13,8 @@ class UserController {
         const users = await userRepository.find({
           select: ["id", "nombre", "email", "estado"]
         });
-      
-        //Retorna Un Objeto de usuarios
-        res.json({
-          ok: true,
-          message: "Consulta exitosa",
-          data: users
-        });
+ 
+        UserController.sendResponse(res, users);
       };
       
       static getUser = async (req: Request, res: Response) => {
@@ -26,18 +23,15 @@ class UserController {
       
         //Se obtiene el usuario de la base de datos
         const userRepository = getRepository(User);
+
         try {
-          const user = await userRepository.findOneOrFail(id, {
-            select: ["id", "nombre", "email", "estado"]
-          });
-          
-          res.json({
-            ok: true,
-            message: "Consulta exitosa",
-            data: user
-          });
+            const user = await userRepository.findOneOrFail(id, {
+                select: ["id", "nombre", "email", "estado"]
+            });
+            UserController.sendResponse(res, user);
+
         } catch (error) {
-          res.status(404).send(`Usuario con id ${ id } no encontrado`);
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_FOUND, false, `Usuario con id ${ id } no encontrado`);
         }
       };
 
@@ -53,7 +47,7 @@ class UserController {
         //Validade if the parameters are ok
         const errors = await validate(user);
         if (errors.length > 0) {
-          res.status(400).send(errors);
+          UserController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, "error", errors);
           return;
         }
       
@@ -64,24 +58,13 @@ class UserController {
         const userRepository = getRepository(User);
         try {
             const  results = await userRepository.save(user);
-
-             //Si todo esta bien, responde 201
-            res.status(201).json({
-                ok: true,
-                mensaje: "Usuario Creado Correctamente",
-                usuario: results
-
-            });
+            UserController.sendResponse(res, results, HTTP_STATUS_CODE_CREATED, true, "Usuario Creado Correctamente");
 
         } catch (e) {
-          res.status(409).json({
-            ok: false,
-            mensaje: "EL email que intenta crear ya esta en uso"
-          });
-          return;
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_CONFLICT, false, e.message);
+            return;
         }
       
-        
       };
 
     static updateUser = async (req: Request, res: Response) => {
@@ -97,9 +80,8 @@ class UserController {
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {
-          //Si no encuentra al usuario, responde 404
-          res.status(404).send("User not found");
-          return;
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_FOUND, false, "User not found");
+            return;
         }
        
         //Validad los nuevos valores a guardar
@@ -107,29 +89,20 @@ class UserController {
         user.estado = estado;
         const errors = await validate(user);
         if (errors.length > 0) {
-          res.status(400).json({
-                ok: false,
-                message: errors
-             });
-          return;
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, "error", errors);
+            return;
         }
       
         //Intenta guardar, si falla, eso significa que el email ya está en uso
         try {
           await userRepository.save(user);
         } catch (e) {
-          res.status(409).json({
-              ok: false,
-              message: "El Email que intenta guardar ya esta en uso"
-            });
-          return;
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_CONFLICT, false, "El Email que intenta guardar ya esta en usos");
+            return;
         }
-        //Despues de Todo envia una respuesta 204
-        res.status(204).json({
-            ok: true,
-            message: "Usuario actualizado correctamente"
-          });
-        };
+        //Despues de Todo envia una respuesta 200
+        UserController.sendResponse(res, null, HTTP_STATUS_CODE_OK, true, "Usuario actualizado");
+      };
       
       static deleteUser = async (req: Request, res: Response) => {
         //Se obtiene el id que viene en la url
@@ -140,21 +113,20 @@ class UserController {
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {
-          res.status(404).json({
-                ok: false,
-                message: "Usuario no encontrado"
-              });
-          return;
+            UserController.sendResponse(res, null, HTTP_STATUS_CODE_NOT_FOUND, false, "Usuario no encontrado");
+            return;
         }
         userRepository.delete(id);
       
         //After all send a 204 (no content, but accepted) response
-        res.status(204).json({
-                  ok: true,
-                  message: "Usuario eliminado correctamente"
-              });
+        UserController.sendResponse(res, null, HTTP_STATUS_CODE_OK);
       };
       
+
+    static sendResponse(response : Response, data: any = null, code : number = HTTP_STATUS_CODE_OK, ok : boolean = true, message : string = "OK", validationError? : ValidationError[]) {
+        const apiResponse = new ApiResponse(response, code, ok, message, data, validationError);
+        apiResponse.sendResponse();
+    }
 
 }
 

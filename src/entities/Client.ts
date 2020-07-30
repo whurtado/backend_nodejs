@@ -1,24 +1,20 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
+import { Entity, Unique, Column, PrimaryGeneratedColumn, ManyToOne, CreateDateColumn, UpdateDateColumn} from 'typeorm';
 import { DocumentType } from './DocumentType';
-import { State } from './State';
+import { Status } from './Status';
 import { City } from './City';
 
 @Entity()
+@Unique(["documenttype","documentnumber"])
 export class Client{
 
     @PrimaryGeneratedColumn('increment')
-    id:string;
+    id:number;
 
     @Column({
         type: 'varchar',
         length: 50,
     })
     name: string;
-
-    @Column({
-        type: 'varchar'
-    })
-    lastname: string;
 
     @ManyToOne(type => DocumentType, documenttype => documenttype.clients)
     documenttype: number;
@@ -47,11 +43,18 @@ export class Client{
     })
     homeaddres: string;
 
-    @ManyToOne(type => State, state => state.clients)
-    state: number;
+    @ManyToOne(type => Status, status => status.clients)
+    status: number;
 
     @ManyToOne(type => City, city => city.clients)
     city: number;
+
+    @Column({
+        type: 'varchar',
+        length: 250,
+        nullable: false
+    })
+    observations: string;
 
     @Column()
     @CreateDateColumn()

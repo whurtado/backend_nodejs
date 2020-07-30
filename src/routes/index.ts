@@ -1,16 +1,26 @@
 import { Router, Request, Response } from "express";
 import auth from "./auth";
 //import rutas from "./router";
-import cliente from "./cliente";
 import user from "./user";
-import role from "./role";
+import client from "./client";
+import documentType from "./documentType";
+import city from "./city";
+import department from "./department";
+import status from "./status";
+import smtpServer  from "./smtpServer";
+
+
 
 const routes = Router();
 
 //routes.use("/router", rutas);
 routes.use("/auth", auth);
-routes.use("/cliente", cliente);
 routes.use("/user", user);
-routes.use("/role", role);
+routes.use("/client", client);
+routes.use("/document-type", documentType);
+routes.use("/city", city);
+routes.use("/department", department);
+routes.use("/status", status);
+routes.use("/smtp-server", smtpServer);
 
 export default routes; 
