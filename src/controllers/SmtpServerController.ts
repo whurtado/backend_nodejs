@@ -6,6 +6,7 @@ import { SmtpServer } from '../entities/SmtpServer';
 import PaginateData from '../classes/PaginateData';
 import ApiResponse from '../classes/ApiResponse';
 import DataNotFoundError from '../classes/errors/DataNotFoundError';
+import Controller from './Controller';
 
 
 class SmtpServerController {
@@ -14,9 +15,9 @@ class SmtpServerController {
         const smtpServerRepository = getRepository(SmtpServer);
         try {
             const data = await smtpServerRepository.find({relations: ["status"]});
-            SmtpServerController.sendResponse(res, data);
+            Controller.sendResponse(res, data);
         } catch (error) {
-            SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+            Controller.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
         }
     }
 
@@ -30,9 +31,9 @@ class SmtpServerController {
                     name: "ASC" 
                 }
             });
-            SmtpServerController.sendResponse(res, data);
+            Controller.sendResponse(res, data);
         } catch (error) {
-            SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+            Controller.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
         }
     }
 
@@ -72,12 +73,12 @@ class SmtpServerController {
                 error.statusCode = HTTP_STATUS_CODE_NOT_FOUND;
                 throw error;
             }
-            SmtpServerController.sendResponse(res, data);
+            Controller.sendResponse(res, data);
         } catch (error) {
             if(error instanceof DataNotFoundError){
-                SmtpServerController.sendResponse(res, null, error.statusCode, false, error.message);
+                Controller.sendResponse(res, null, error.statusCode, false, error.message);
             }else{
-                SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+                Controller.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
             }
         }
     } 
@@ -112,10 +113,10 @@ class SmtpServerController {
             const smtpServerRepository = getRepository(SmtpServer);
             const results = await smtpServerRepository.save(smtpServer);
 
-            SmtpServerController.sendResponse(res, results, HTTP_STATUS_CODE_CREATED, true, "Servidor SMTP creado correctamente");
+            Controller.sendResponse(res, results, HTTP_STATUS_CODE_CREATED, true, "Servidor SMTP creado correctamente");
             
         } catch (error) {
-            SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+            Controller.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
         }
     }
 
@@ -158,21 +159,18 @@ class SmtpServerController {
            
             const result = await smtpServerRepository.save(smtpServer);
         
-            SmtpServerController.sendResponse(res, result, HTTP_STATUS_CODE_OK, true, "Servidor SMTP actualizado correctamente");
+            Controller.sendResponse(res, result, HTTP_STATUS_CODE_OK, true, "Servidor SMTP actualizado correctamente");
             
         } catch (error) {
             if(error instanceof DataNotFoundError){
-                SmtpServerController.sendResponse(res, null, error.statusCode, false, error.message);
+                Controller.sendResponse(res, null, error.statusCode, false, error.message);
             }else{
-                SmtpServerController.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
+                Controller.sendResponse(res, null, HTTP_STATUS_CODE_BAD_REQUEST, false, error.message);
             }
         }
     }
 
-    static sendResponse(response : Response, data: any = null, code : number = HTTP_STATUS_CODE_OK, ok : boolean = true, message : string = "OK", validationError? : ValidationError[]) {
-        const apiResponse = new ApiResponse(response, code, ok, message, data, validationError);
-        apiResponse.sendResponse();
-    }
+  
 
 }
 

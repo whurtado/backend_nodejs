@@ -8,6 +8,7 @@ import city from "./city";
 import department from "./department";
 import status from "./status";
 import smtpServer  from "./smtpServer";
+import email from "./email";
 
 
 
@@ -22,5 +23,6 @@ routes.use("/city", city);
 routes.use("/department", department);
 routes.use("/status", status);
 routes.use("/smtp-server", smtpServer);
+routes.use("/send-email", email);
 
 export default routes; 
