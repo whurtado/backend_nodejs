@@ -3,7 +3,7 @@ import * as jwt from "jsonwebtoken";
 import { getRepository } from "typeorm";
 import { validate } from "class-validator";
 
-import { Usuario } from '../entities/Usuario';
+import { User } from '../entities/User';
 import config from "../config/config";
 
 class AuthController {
@@ -16,8 +16,8 @@ class AuthController {
     }
 
     //Obtener el usuario de la base de datos
-    const userRepository = getRepository(Usuario);
-    let user: Usuario ;
+    const userRepository = getRepository(User);
+    let user: User ;
 
     try {
       user = await userRepository.findOneOrFail({ where: { email } });
@@ -60,9 +60,9 @@ class AuthController {
     }
 
     //Obtiene el usuario de la base de datos
-    const userRepository = getRepository(Usuario);
+    const userRepository = getRepository(User);
 
-    let user: Usuario;
+    let user: User;
     try {
       user = await userRepository.findOneOrFail(id);
 

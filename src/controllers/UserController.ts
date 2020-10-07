@@ -1,17 +1,15 @@
 import { Request, Response} from 'express';
 import { getRepository } from 'typeorm';
-import { Usuario } from '../entities/Usuario';
+import { User } from '../entities/User';
 import { validate, ValidationError } from 'class-validator';
 import ApiResponse from '../classes/ApiResponse';
 import { HTTP_STATUS_CODE_OK, HTTP_STATUS_CODE_NOT_FOUND, HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_NOT_CONFLICT } from '../global/statuscode';
 
-class UserController {
+class UserController { 
 
-   
-
-     static getUsuarios = async (req: Request, res: Response) => {
+     static getUsers = async (req: Request, res: Response) => {
         //Get users from database
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         const users = await userRepository.find({
           select: ["id", "nombre", "email", "estado"]
         });
@@ -19,12 +17,12 @@ class UserController {
         UserController.sendResponse(res, users);
       };
       
-      static getUsuario = async (req: Request, res: Response) => {
+      static getUser = async (req: Request, res: Response) => {
         //Se obtiene el id que llega por parametro en la url
         const id: string = req.params.id;
       
         //Se obtiene el usuario de la base de datos
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
 
         try {
             const user = await userRepository.findOneOrFail(id, {
@@ -37,10 +35,10 @@ class UserController {
         }
       };
 
-    static createUsuario = async (req: Request, res: Response) => {
+    static createUser = async (req: Request, res: Response) => {
         //Se obtienen los parametros que llegan en el body
         let { nombre, email, password, estado } = req.body;
-        let user      = new Usuario();
+        let user      = new User();
         user.nombre   = nombre;
         user.email    = email;
         user.password = password;
@@ -57,7 +55,7 @@ class UserController {
         user.hashPassword();
       
         //Try to save. If fails, the username is already in use
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         try {
             const  results = await userRepository.save(user);
             UserController.sendResponse(res, results, HTTP_STATUS_CODE_CREATED, true, "Usuario Creado Correctamente");
@@ -68,14 +66,8 @@ class UserController {
         }
       
       };
-      
-    /*static createUsuario = async (req: Request,res: Response): Promise<Response> => {
-    const newUsuario = await getRepository(Usuario).create(req.body);
-    const results = await getRepository(Usuario).save(newUsuario);
-    return res.json(results);
-    };*/
 
-    static updateUsuario = async (req: Request, res: Response) => {
+    static updateUser = async (req: Request, res: Response) => {
         //Se obtiene el id que viene en la url
         const id = req.params.id;
       
@@ -83,7 +75,7 @@ class UserController {
         const { email, estado } = req.body;
       
         //Se busca el usuario ha actualizar en la base de datos
-        const userRepository = getRepository(Usuario);
+        const userRepository = getRepository(User);
         let user;
         try {
           user = await userRepository.findOneOrFail(id);
@@ -112,12 +104,12 @@ class UserController {
         UserController.sendResponse(res, null, HTTP_STATUS_CODE_OK, true, "Usuario actualizado");
       };
       
-      static deleteUsuario = async (req: Request, res: Response) => {
+      static deleteUser = async (req: Request, res: Response) => {
         //Se obtiene el id que viene en la url
         const id = req.params.id;
       
-        const userRepository = getRepository(Usuario);
-        let user: Usuario;
+        const userRepository = getRepository(User);
+        let user: User;
         try {
           user = await userRepository.findOneOrFail(id);
         } catch (error) {

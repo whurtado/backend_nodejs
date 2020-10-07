@@ -1,6 +1,6 @@
 import { Router, Request, Response } from 'express';
 //import { getClientes, getCliente, createCliente, updateCliente, deleteCliente } from '../controllers/Cliente.controller';
-import { getUsuarios, getUsuario, createUsuario, updateUsuario, deleteUsuario } from '../controllers/Usuario.controller';
+//import { getUsuarios, getUsuario, createUsuario, updateUsuario, deleteUsuario } from '../controllers/Usuario.controller';
 
 
 const router = Router();
@@ -45,11 +45,11 @@ router.post('/mensajes/:id', (req:Request, res:Response ) =>{
 
 
 //RUTAS USUARIO
-router.get('/user', getUsuarios);
-router.get('/user/:id', getUsuario);
-router.post('/user', createUsuario);
-router.put('/user/:id', updateUsuario);
-router.delete('/user/:id', deleteUsuario);
+// router.get('/user', getUsuarios);
+// router.get('/user/:id', getUsuario);
+// router.post('/user', createUsuario);
+// router.put('/user/:id', updateUsuario);
+// router.delete('/user/:id', deleteUsuario);
 
 
 //RUTAS CLIENTE
